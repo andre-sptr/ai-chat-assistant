@@ -13,8 +13,6 @@ type Message = {
   role: 'user' | 'assistant' | 'tool';
   content: string;
   imageUrl?: string;
-  videoUrl?: string;
-  videoOp?: string;
   toolCalls?: Array<{
     id: string;
     name: string;
@@ -93,17 +91,15 @@ const CodeBlock = ({ children, className, ...props }: any) => {
           <div className="flex bg-slate-900/50 p-1 rounded-lg border border-slate-700/50">
             <button
               onClick={() => setView('code')}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
-                view === 'code' ? 'bg-cyan-500/20 text-cyan-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${view === 'code' ? 'bg-cyan-500/20 text-cyan-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'
+                }`}
             >
               Code
             </button>
             <button
               onClick={() => setView('preview')}
-              className={`flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-md transition-all ${
-                view === 'preview' ? 'bg-cyan-500/20 text-cyan-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'
-              }`}
+              className={`flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-md transition-all ${view === 'preview' ? 'bg-cyan-500/20 text-cyan-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'
+                }`}
             >
               <Sparkles className="w-3 h-3" />
               Preview
@@ -137,14 +133,14 @@ const CodeBlock = ({ children, className, ...props }: any) => {
   )
 }
 
-const MermaidBlock = ({ 
-  code, 
-  theme, 
-  onExpand 
-}: { 
-  code: string; 
+const MermaidBlock = ({
+  code,
+  theme,
+  onExpand
+}: {
+  code: string;
   theme: 'light' | 'dark';
-  onExpand: (svgContent: string) => void; 
+  onExpand: (svgContent: string) => void;
 }) => {
   const [svg, setSvg] = useState('')
   const [error, setError] = useState(false)
@@ -183,18 +179,16 @@ const MermaidBlock = ({
   if (!svg) return <div className="animate-pulse h-32 bg-slate-800/20 rounded-xl my-4" />
 
   return (
-    <div 
+    <div
       className="relative group my-4 cursor-zoom-in transition-all"
       onClick={() => onExpand(svg)}
     >
-      <div className={`p-4 rounded-xl overflow-hidden max-h-[300px] relative ${
-        theme === 'dark' ? 'bg-slate-900/50 border border-white/10' : 'bg-white border border-slate-200'
-      }`}>
+      <div className={`p-4 rounded-xl overflow-hidden max-h-[300px] relative ${theme === 'dark' ? 'bg-slate-900/50 border border-white/10' : 'bg-white border border-slate-200'
+        }`}>
         <div className="flex justify-center" dangerouslySetInnerHTML={{ __html: svg }} />
-        
-        <div className={`absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t ${
-           theme === 'dark' ? 'from-slate-900 via-slate-900/50' : 'from-white via-white/50'
-        } to-transparent pointer-events-none`} />
+
+        <div className={`absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t ${theme === 'dark' ? 'from-slate-900 via-slate-900/50' : 'from-white via-white/50'
+          } to-transparent pointer-events-none`} />
       </div>
 
       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-[1px] rounded-xl">
@@ -207,12 +201,12 @@ const MermaidBlock = ({
   )
 }
 
-const ToolCallDisplay = ({ toolCalls, theme }: { 
+const ToolCallDisplay = ({ toolCalls, theme }: {
   toolCalls: Array<{ id: string; name: string; arguments: any }>;
   theme: 'light' | 'dark';
 }) => {
   const isDark = theme === 'dark'
-  
+
   const getToolIcon = (toolName: string) => {
     switch (toolName) {
       case 'calculator': return '🧮'
@@ -233,33 +227,29 @@ const ToolCallDisplay = ({ toolCalls, theme }: {
   return (
     <div className="my-3 space-y-2">
       {toolCalls.map((call, index) => (
-        <motion.div 
+        <motion.div
           key={call.id}
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: index * 0.1 }}
-          className={`flex items-start gap-3 p-3 rounded-lg border ${
-            isDark 
-              ? 'bg-cyan-950/20 border-cyan-500/30 shadow-lg shadow-cyan-500/5' 
-              : 'bg-cyan-50 border-cyan-300 shadow-sm'
-          }`}
+          className={`flex items-start gap-3 p-3 rounded-lg border ${isDark
+            ? 'bg-cyan-950/20 border-cyan-500/30 shadow-lg shadow-cyan-500/5'
+            : 'bg-cyan-50 border-cyan-300 shadow-sm'
+            }`}
         >
           <span className="text-2xl">{getToolIcon(call.name)}</span>
           <div className="flex-1 min-w-0">
-            <div className={`text-xs font-semibold uppercase tracking-wider mb-1.5 flex items-center gap-2 ${
-              isDark ? 'text-cyan-400' : 'text-cyan-700'
-            }`}>
+            <div className={`text-xs font-semibold uppercase tracking-wider mb-1.5 flex items-center gap-2 ${isDark ? 'text-cyan-400' : 'text-cyan-700'
+              }`}>
               <Zap className="w-3.5 h-3.5" />
               {getToolDisplayName(call.name)}
             </div>
-            <div className={`text-xs ${
-              isDark ? 'text-slate-400' : 'text-slate-600'
-            }`}>
+            <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'
+              }`}>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(call.arguments).map(([key, value]) => (
-                  <div key={key} className={`px-2 py-1 rounded ${
-                    isDark ? 'bg-slate-800/50' : 'bg-white'
-                  }`}>
+                  <div key={key} className={`px-2 py-1 rounded ${isDark ? 'bg-slate-800/50' : 'bg-white'
+                    }`}>
                     <span className={isDark ? 'text-slate-500' : 'text-slate-500'}>
                       {key}:
                     </span>
@@ -308,7 +298,7 @@ const ToolResultDisplay = ({ toolName, result, theme }: {
     if (result.datetime) return result.datetime
     if (result.definition) return result.definition
     if (result.tasks) {
-      return result.tasks.map((t: any, i: number) => 
+      return result.tasks.map((t: any, i: number) =>
         `${i + 1}. ${t.task}`
       ).join('\n')
     }
@@ -319,21 +309,19 @@ const ToolResultDisplay = ({ toolName, result, theme }: {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`my-3 p-4 rounded-lg border ${
-        isSuccess 
-          ? isDark 
-            ? 'bg-green-950/20 border-green-500/30 shadow-lg shadow-green-500/5' 
-            : 'bg-green-50 border-green-300 shadow-sm'
-          : isDark
-            ? 'bg-red-950/20 border-red-500/30 shadow-lg shadow-red-500/5'
-            : 'bg-red-50 border-red-300 shadow-sm'
-      }`}
+      className={`my-3 p-4 rounded-lg border ${isSuccess
+        ? isDark
+          ? 'bg-green-950/20 border-green-500/30 shadow-lg shadow-green-500/5'
+          : 'bg-green-50 border-green-300 shadow-sm'
+        : isDark
+          ? 'bg-red-950/20 border-red-500/30 shadow-lg shadow-red-500/5'
+          : 'bg-red-50 border-red-300 shadow-sm'
+        }`}
     >
-      <div className={`flex items-center gap-2 mb-3 ${
-        isSuccess 
-          ? isDark ? 'text-green-400' : 'text-green-700'
-          : isDark ? 'text-red-400' : 'text-red-700'
-      }`}>
+      <div className={`flex items-center gap-2 mb-3 ${isSuccess
+        ? isDark ? 'text-green-400' : 'text-green-700'
+        : isDark ? 'text-red-400' : 'text-red-700'
+        }`}>
         <span className="text-xl">{getToolIcon(toolName)}</span>
         <span className="text-sm font-semibold">
           {isSuccess ? '✓' : '✗'} {getToolDisplayName(toolName)}
@@ -344,13 +332,12 @@ const ToolResultDisplay = ({ toolName, result, theme }: {
         {isSuccess ? (
           <div className="space-y-2">
             {result.formatted && (
-              <div className={`font-mono text-base p-3 rounded ${
-                isDark ? 'bg-slate-800/50' : 'bg-white'
-              }`}>
+              <div className={`font-mono text-base p-3 rounded ${isDark ? 'bg-slate-800/50' : 'bg-white'
+                }`}>
                 {result.formatted}
               </div>
             )}
-            
+
             {result.datetime && (
               <div className={`p-3 rounded ${isDark ? 'bg-slate-800/50' : 'bg-white'}`}>
                 <div className="text-xs text-slate-500 mb-1">📍 {result.timezone}</div>
@@ -371,7 +358,7 @@ const ToolResultDisplay = ({ toolName, result, theme }: {
                   🔍 Rangkuman Pencarian:
                 </div>
                 <div className="leading-relaxed">{result.answer}</div>
-                
+
                 <div className="mt-3 pt-2 border-t border-slate-600/20 text-xs text-slate-500">
                   Sumber: Tavily Search API
                 </div>
@@ -393,14 +380,13 @@ const ToolResultDisplay = ({ toolName, result, theme }: {
               </div>
             )}
 
-            {!result.formatted && !result.datetime &&  !result.definition &&  !result.tasks &&  !result.answer && !result.colors && !result.analysis &&
-             (
-              <pre className={`text-xs font-mono overflow-x-auto p-3 rounded ${
-                isDark ? 'bg-slate-800/50' : 'bg-white'
-              }`}>
-                {JSON.stringify(result, null, 2)}
-              </pre>
-            )}
+            {!result.formatted && !result.datetime && !result.definition && !result.tasks && !result.answer && !result.colors && !result.analysis &&
+              (
+                <pre className={`text-xs font-mono overflow-x-auto p-3 rounded ${isDark ? 'bg-slate-800/50' : 'bg-white'
+                  }`}>
+                  {JSON.stringify(result, null, 2)}
+                </pre>
+              )}
           </div>
         ) : (
           <div className={`p-3 rounded ${isDark ? 'bg-slate-800/50' : 'bg-white'}`}>
@@ -494,7 +480,7 @@ export default function Home() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [speakingId, setSpeakingId] = useState<string | null>(null)
   const [showModelDropdown, setShowModelDropdown] = useState(false)
-  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash')
+  const [selectedModel, setSelectedModel] = useState('gemini/gemini-2.5-flash')
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
   const [useTools, setUseTools] = useState(false)
   const [docContext, setDocContext] = useState<{ name: string; content: string } | null>(null)
@@ -506,9 +492,9 @@ export default function Home() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   type LightboxState =
-  | { kind: 'image' | 'video'; src: string; filename: string }
-  | { kind: 'mermaid'; content: string; filename: string }
-  | null
+    | { kind: 'image'; src: string; filename: string }
+    | { kind: 'mermaid'; content: string; filename: string }
+    | null
 
   const [lightbox, setLightbox] = useState<LightboxState>(null)
 
@@ -537,26 +523,12 @@ export default function Home() {
   }, [transcript, setTranscript])
 
   const models = [
-    { id: 'gemini-3-pro-preview', name: 'Gemini 3 Pro', desc: 'Reasoning & Agentic Paling Canggih' },
-    { id: 'gemini-3-pro-image-preview', name: 'Gemini 3 Pro (Image)', desc: 'Generasi Gambar & Teks High-Fidelity' },
-
-    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', desc: 'Reasoning Kompleks & Coding' },
-    { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', desc: 'Cepat & Cerdas (Recommended)' },
-    { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash-Lite', desc: 'Ringan & Hemat Biaya' },
-    { id: 'gemini-2.5-flash-image', name: 'Gemini 2.5 Flash (Image)', desc: 'Pembuatan & Edit Aset Visual' },
-
-    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', desc: 'Versi Stabil Sebelumnya' },
-    { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash-Lite', desc: 'Efisien untuk Tugas Sederhana' },
-
-    { id: 'gemini-flash-latest', name: 'Gemini Flash', desc: 'Versi Flash Paling Baru' },
-    { id: 'gemini-flash-lite-latest', name: 'Gemini Flash-Lite', desc: 'Versi Lite Paling Baru' },
-
-    { id: 'imagen-4.0-fast-generate-001', name: 'Imagen 4.0 Fast (Image)', desc: 'Generasi Gambar Cepat' },
-    { id: 'imagen-4.0-generate-001', name: 'Imagen 4.0 (Image)', desc: 'Generasi Gambar Kualitas Tinggi' },
-    { id: 'imagen-4.0-ultra-generate-001', name: 'Imagen 4.0 Ultra (Image)', desc: 'Detail Gambar Ultra Realistis' },
-    { id: 'veo-2.0-generate-001', name: 'Veo 2.0 (Video)', desc: 'Generasi Video Sinematik' },
-
-    { id: 'gemini-robotics-er-1.5-preview', name: 'Gemini Robotics 1.5', desc: 'Model Eksperimental Robotika' },
+    { id: 'gemini/gemini-3-pro-preview', name: 'Gemini 3 Pro', desc: 'Reasoning & Agentic Paling Canggih' },
+    { id: 'gemini/gemini-2.5-pro', name: 'Gemini 2.5 Pro', desc: 'Reasoning Kompleks & Coding' },
+    { id: 'gemini/gemini-2.5-flash', name: 'Gemini 2.5 Flash', desc: 'Cepat & Cerdas (Recommended)' },
+    { id: 'gemini/gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash-Lite', desc: 'Ringan & Hemat Biaya' },
+    { id: 'gemini/gemini-2.0-flash', name: 'Gemini 2.0 Flash', desc: 'Versi Stabil Sebelumnya' },
+    { id: 'gemini/gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash-Lite', desc: 'Efisien untuk Tugas Sederhana' },
   ]
 
   const scrollToBottom = () => {
@@ -567,7 +539,7 @@ export default function Home() {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
     const initialTheme = savedTheme || 'dark';
     setTheme(initialTheme);
-    
+
     if (initialTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
@@ -626,12 +598,12 @@ export default function Home() {
     window.speechSynthesis.cancel()
 
     const cleanText = text
-      .replace(/```[\s\S]*?```/g, "Kode program.") 
-      .replace(/[#*`_]/g, "") 
+      .replace(/```[\s\S]*?```/g, "Kode program.")
+      .replace(/[#*`_]/g, "")
 
     const utterance = new SpeechSynthesisUtterance(cleanText)
-    
-    utterance.lang = 'id-ID' 
+
+    utterance.lang = 'id-ID'
     utterance.rate = 1.0
     utterance.pitch = 1.0
 
@@ -681,15 +653,15 @@ export default function Home() {
     if (isLoading) return
 
     const msgToEdit = messages[index]
-    
+
     setInput(msgToEdit.content)
     if (msgToEdit.imageUrl) {
-        setSelectedImage(msgToEdit.imageUrl)
+      setSelectedImage(msgToEdit.imageUrl)
     }
 
     setEditingIndex(index)
     setTimeout(() => {
-        textareaRef.current?.focus()
+      textareaRef.current?.focus()
     }, 100)
   }
 
@@ -699,36 +671,7 @@ export default function Home() {
     setSelectedImage(null)
   }
 
-  const pollVideo = async (op: string, assistantId: string) => {
-    while (true) {
-      await new Promise(r => setTimeout(r, 10000))
 
-      const r = await fetch(`/api/video/status?op=${encodeURIComponent(op)}`)
-      const j = await r.json()
-
-      if (!j.done) continue
-
-      if (j.videoUrl) {
-        setMessages(prev => prev.map(m =>
-          m.id === assistantId
-          ? {
-              ...m,
-              videoUrl: j.videoUrl,
-              videoOp: undefined,
-              content: '🎬 Video sudah selesai dibuat',
-            }
-          : m
-        ))
-      } else {
-        setMessages(prev => prev.map(m =>
-          m.id === assistantId
-            ? { ...m, content: (m.content || '') + '\n\n❌ Gagal membuat video.', videoOp: undefined }
-            : m
-        ))
-      }
-      break
-    }
-  }
 
   const handleDocSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -743,16 +686,16 @@ export default function Home() {
         method: 'POST',
         body: formData
       })
-      
+
       const data = await res.json()
-      
+
       if (!res.ok) throw new Error(data.error)
 
       setDocContext({
         name: data.filename,
         content: data.text
       })
-      
+
     } catch (err: any) {
       alert(err.message)
     } finally {
@@ -792,11 +735,11 @@ export default function Home() {
           } else {
             errMsg = await response.text()
           }
-        } catch {}
+        } catch { }
 
         setMessages(prev => [
           ...prev,
-          { id: (Date.now()+1).toString(), role: 'assistant', content: `❌ ${errMsg}` },
+          { id: (Date.now() + 1).toString(), role: 'assistant', content: `❌ ${errMsg}` },
         ])
 
         return
@@ -823,7 +766,7 @@ export default function Home() {
             setTimeout(() => {
               setMessages(prev => {
                 const newMessages = [...prev]
-                
+
                 data.toolResults.forEach((tr: any) => {
                   newMessages.push({
                     id: `${Date.now()}-${tr.toolCallId}`,
@@ -850,14 +793,8 @@ export default function Home() {
             role: 'assistant',
             content: data.text ?? '',
             imageUrl: data.imageUrl,
-            videoUrl: data.videoUrl,
-            videoOp: data.videoOp,
           },
         ])
-
-        if (data.videoOp) {
-          pollVideo(data.videoOp, assistantId)
-        }
         return
       }
 
@@ -902,7 +839,7 @@ export default function Home() {
     const userText = input
     const currentImage = selectedImage
     const currentDoc = docContext
-    
+
     setInput('')
     setSelectedImage(null)
     setDocContext(null)
@@ -912,10 +849,10 @@ export default function Home() {
     if (currentDoc) {
       finalContent = `[KONTEKS DOKUMEN: ${currentDoc.name}]\n${currentDoc.content}\n\n[PERTANYAAN USER]:\n${userText}`
     }
-    
-    const newMessage: Message = { 
-      id: Date.now().toString(), 
-      role: 'user', 
+
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
       content: finalContent,
       imageUrl: currentImage || undefined
     }
@@ -953,9 +890,9 @@ export default function Home() {
     const lastMsg = newHistory[newHistory.length - 1]
 
     if (lastMsg.role === 'assistant') {
-       newHistory.pop() 
+      newHistory.pop()
     }
-    
+
     setMessages(newHistory)
     await generateResponse(newHistory)
   }
@@ -965,7 +902,7 @@ export default function Home() {
 
   return (
     <main className={`relative h-screen overflow-hidden selection:bg-cyan-500/30 font-sans flex flex-col transition-colors duration-300 ${isDark ? 'bg-slate-950 text-white' : 'bg-slate-200 text-slate-800'}`}>
-      
+
       <div className="absolute inset-0 z-0 pointer-events-none fixed">
         <div className={`absolute inset-0 ${isDark ? 'bg-grid-white' : 'bg-grid-black'} bg-[size:50px_50px]`} />
         <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-t from-slate-950 via-slate-950/50 to-slate-950/80' : 'bg-gradient-to-t from-slate-200 via-slate-200/50 to-slate-200/80'}`} />
@@ -974,7 +911,7 @@ export default function Home() {
       <header className={`fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 border-b shadow-sm transition-colors duration-300 
         ${isDark ? 'bg-slate-950/80 backdrop-blur-md border-white/5' : 'bg-slate-200/80 backdrop-blur-md border-slate-300'}`}
       >
-        
+
         <div className="flex items-center gap-3">
           <img src="/favicon.ico" alt="Logo" className="w-8 h-8" />
           <span className={`font-bold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500`}>
@@ -983,107 +920,105 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-3">
-            <button
-                onClick={toggleTheme}
-                className={`p-2 rounded-full transition-colors 
-                  ${isDark 
-                    ? 'text-cyan-400 hover:bg-slate-800' 
-                    : 'text-slate-600 hover:bg-slate-200'
-                  }`}
-                title={isDark ? "Ganti ke Light Mode" : "Ganti ke Dark Mode"}
-            >
-                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-full transition-colors 
+                  ${isDark
+                ? 'text-cyan-400 hover:bg-slate-800'
+                : 'text-slate-600 hover:bg-slate-200'
+              }`}
+            title={isDark ? "Ganti ke Light Mode" : "Ganti ke Dark Mode"}
+          >
+            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
 
-            <label className={`flex items-center gap-1 text-xs cursor-pointer px-3 py-1.5 rounded-full border transition-all ${
-              useTools 
-                ? isDark 
-                  ? 'bg-cyan-950/30 border-cyan-500/50 text-cyan-400' 
-                  : 'bg-cyan-100 border-cyan-500 text-cyan-700'
-                : isDark
+          <label className={`flex items-center gap-1 text-xs cursor-pointer px-3 py-1.5 rounded-full border transition-all ${useTools
+            ? isDark
+              ? 'bg-cyan-950/30 border-cyan-500/50 text-cyan-400'
+              : 'bg-cyan-100 border-cyan-500 text-cyan-700'
+            : isDark
+              ? 'bg-slate-900 border-white/10 hover:border-cyan-500/50 text-slate-300'
+              : 'bg-white border-slate-300 hover:border-cyan-500/50 text-slate-700'
+            }`}>
+            <input
+              type="checkbox"
+              checked={useTools}
+              onChange={(e) => setUseTools(e.target.checked)}
+              className="w-3.5 h-3.5 rounded"
+            />
+            <Zap className="w-3.5 h-3.5" />
+            <span>Tools</span>
+          </label>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowModelDropdown(!showModelDropdown)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all text-xs sm:text-sm
+                        ${isDark
                   ? 'bg-slate-900 border-white/10 hover:border-cyan-500/50 text-slate-300'
                   : 'bg-white border-slate-300 hover:border-cyan-500/50 text-slate-700'
-            }`}>
-              <input
-                type="checkbox"
-                checked={useTools}
-                onChange={(e) => setUseTools(e.target.checked)}
-                className="w-3.5 h-3.5 rounded"
-              />
-              <Zap className="w-3.5 h-3.5" />
-              <span>Tools</span>
-            </label>
-            
-            <div className="relative">
-                <button
-                    onClick={() => setShowModelDropdown(!showModelDropdown)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all text-xs sm:text-sm
-                        ${isDark 
-                          ? 'bg-slate-900 border-white/10 hover:border-cyan-500/50 text-slate-300' 
-                          : 'bg-white border-slate-300 hover:border-cyan-500/50 text-slate-700'
-                        }`}
+                }`}
+            >
+              <span className="truncate max-w-[150px]">
+                {models.find(m => m.id === selectedModel)?.name}
+              </span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showModelDropdown ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showModelDropdown && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowModelDropdown(false)}
+                />
+
+                <div className={`absolute right-0 top-full mt-2 w-72 backdrop-blur-xl border rounded-xl shadow-2xl overflow-hidden z-50 flex flex-col 
+                      ${isDark
+                    ? 'bg-slate-900/95 border-white/10'
+                    : 'bg-white/95 border-slate-300'
+                  }`}
                 >
-                    <span className="truncate max-w-[150px]">
-                      {models.find(m => m.id === selectedModel)?.name}
+                  <div className={`px-4 py-3 border-b ${isDark ? 'border-white/5 bg-white/5' : 'border-slate-300/50 bg-slate-100'}`}>
+                    <span className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-cyan-400' : 'text-cyan-600'}`}>
+                      Pilih Model AI
                     </span>
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showModelDropdown ? 'rotate-180' : ''}`} />
-                </button>
+                  </div>
 
-                {showModelDropdown && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-40" 
-                      onClick={() => setShowModelDropdown(false)}
-                    />
-                    
-                    <div className={`absolute right-0 top-full mt-2 w-72 backdrop-blur-xl border rounded-xl shadow-2xl overflow-hidden z-50 flex flex-col 
-                      ${isDark 
-                        ? 'bg-slate-900/95 border-white/10' 
-                        : 'bg-white/95 border-slate-300'
-                      }`}
-                    >
-                      <div className={`px-4 py-3 border-b ${isDark ? 'border-white/5 bg-white/5' : 'border-slate-300/50 bg-slate-100'}`}>
-                        <span className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-cyan-400' : 'text-cyan-600'}`}>
-                          Pilih Model AI
-                        </span>
-                      </div>
-
-                      <div className="p-1.5 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-500/20 scrollbar-track-transparent">
-                        {models.map((model) => (
-                          <button
-                            key={model.id}
-                            onClick={() => {
-                              setSelectedModel(model.id)
-                              setShowModelDropdown(false)
-                            }}
-                            className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 flex flex-col gap-0.5 group ${
-                              selectedModel === model.id 
-                                ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-sm' 
-                                : isDark 
-                                  ? 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'
-                                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-transparent'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between w-full">
-                              <span className={`font-medium truncate ${selectedModel === model.id ? 'text-cyan-300' : isDark ? 'text-slate-200 group-hover:text-white' : 'text-slate-900 group-hover:text-slate-900'}`}>
-                                {model.name}
-                              </span>
-                              {selectedModel === model.id && <Check className="w-3.5 h-3.5 flex-shrink-0" />}
-                            </div>
-                            <span className={`text-xs opacity-70 line-clamp-1 ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>{model.desc}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-            </div>
+                  <div className="p-1.5 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-500/20 scrollbar-track-transparent">
+                    {models.map((model) => (
+                      <button
+                        key={model.id}
+                        onClick={() => {
+                          setSelectedModel(model.id)
+                          setShowModelDropdown(false)
+                        }}
+                        className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200 flex flex-col gap-0.5 group ${selectedModel === model.id
+                          ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-sm'
+                          : isDark
+                            ? 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'
+                            : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 border border-transparent'
+                          }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className={`font-medium truncate ${selectedModel === model.id ? 'text-cyan-300' : isDark ? 'text-slate-200 group-hover:text-white' : 'text-slate-900 group-hover:text-slate-900'}`}>
+                            {model.name}
+                          </span>
+                          {selectedModel === model.id && <Check className="w-3.5 h-3.5 flex-shrink-0" />}
+                        </div>
+                        <span className={`text-xs opacity-70 line-clamp-1 ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>{model.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
       <div className="relative z-10 flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pt-24 pb-40">
         <div className="max-w-3xl mx-auto space-y-8">
-          
+
           {messages.length === 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1102,7 +1037,7 @@ export default function Home() {
               <p className="text-slate-400 text-lg">
                 Mulai percakapan dengan Reka. Ubah ide menjadi kode secara realtime.
                 {useTools && (
-                  <motion.span 
+                  <motion.span
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="block mt-3 text-sm font-medium text-cyan-400 bg-cyan-950/30 border border-cyan-500/20 py-2 px-4 rounded-lg backdrop-blur-md"
@@ -1120,7 +1055,7 @@ export default function Home() {
 
               let displayContent = msg.content
               let attachedDocName = null
-              
+
               if (msg.role === 'user' && displayContent.includes('[KONTEKS DOKUMEN:')) {
                 const nameMatch = displayContent.match(/\[KONTEKS DOKUMEN: (.*?)\]/)
                 if (nameMatch) {
@@ -1145,25 +1080,25 @@ export default function Home() {
                       <img
                         src="/favicon.ico"
                         alt="Logo Reka"
-                        className={`w-7.5 h-7.5 ${msg.videoOp && !msg.videoUrl ? 'animate-spin' : ''}`}
+                        className="w-7.5 h-7.5"
                       />
                     </div>
                   )}
 
                   <div className={`relative max-w-[85%] rounded-2xl p-4 shadow-xl backdrop-blur-sm border 
-                    ${editingIndex === index 
-                        ? isDark 
-                            ? 'ring-2 ring-cyan-500/50 border-cyan-500/30 bg-slate-800' 
-                            : 'ring-2 ring-cyan-600/60 border-cyan-600/60 bg-slate-200' 
-                        : ''
+                    ${editingIndex === index
+                      ? isDark
+                        ? 'ring-2 ring-cyan-500/50 border-cyan-500/30 bg-slate-800'
+                        : 'ring-2 ring-cyan-600/60 border-cyan-600/60 bg-slate-200'
+                      : ''
                     } 
-                    ${msg.role === 'user' 
-                      ? isDark 
-                          ? 'bg-slate-800/80 border-slate-700 text-slate-100 rounded-br-none' 
-                          : 'bg-white border-slate-300 text-slate-900 rounded-br-none'
-                      : isDark 
-                          ? 'bg-slate-950/50 border-white/10 text-slate-300 rounded-bl-none prose-headings:text-cyan-200 prose-strong:text-cyan-400' 
-                          : 'bg-white border-slate-400 text-slate-900 rounded-bl-none prose-headings:text-cyan-700 prose-strong:text-cyan-600'
+                    ${msg.role === 'user'
+                      ? isDark
+                        ? 'bg-slate-800/80 border-slate-700 text-slate-100 rounded-br-none'
+                        : 'bg-white border-slate-300 text-slate-900 rounded-br-none'
+                      : isDark
+                        ? 'bg-slate-950/50 border-white/10 text-slate-300 rounded-bl-none prose-headings:text-cyan-200 prose-strong:text-cyan-400'
+                        : 'bg-white border-slate-400 text-slate-900 rounded-bl-none prose-headings:text-cyan-700 prose-strong:text-cyan-600'
                     }`}
                   >
 
@@ -1183,36 +1118,13 @@ export default function Home() {
                         />
                       )}
 
-                      {msg.videoUrl && (
-                        <div
-                          className="mb-3 w-full rounded-xl border border-white/10 overflow-hidden cursor-zoom-in"
-                          onClick={() =>
-                            setLightbox({
-                              kind: 'video',
-                              src: msg.videoUrl!,
-                              filename: `reka-video-${msg.id}.mp4`,
-                            })
-                          }
-                        >
-                          <video
-                            src={msg.videoUrl}
-                            muted
-                            playsInline
-                            className="w-full block pointer-events-none"
-                          />
-                        </div>
-                      )}
 
-                      {msg.videoOp && !msg.videoUrl && (
-                        <div className="text-xs text-slate-400 mt-2">⏳ Rendering video…</div>
-                      )}
 
                       {attachedDocName && (
-                        <div className={`flex items-center gap-2 mb-3 px-3 py-2 rounded-lg text-xs font-medium border w-fit ${
-                          isDark 
-                            ? 'bg-slate-900/50 border-white/10 text-cyan-200' 
-                            : 'bg-slate-50 border-slate-300 text-cyan-700'
-                        }`}>
+                        <div className={`flex items-center gap-2 mb-3 px-3 py-2 rounded-lg text-xs font-medium border w-fit ${isDark
+                          ? 'bg-slate-900/50 border-white/10 text-cyan-200'
+                          : 'bg-slate-50 border-slate-300 text-cyan-700'
+                          }`}>
                           <Paperclip className="w-3.5 h-3.5" />
                           <span className="truncate max-w-[200px]">{attachedDocName}</span>
                         </div>
@@ -1226,11 +1138,11 @@ export default function Home() {
                       {/* ============= SHOW TOOL RESULTS ============= */}
                       {msg.role === 'assistant' && (() => {
                         const nextMessages = messages.slice(index + 1)
-                        const toolResults = nextMessages.filter(m => 
-                          m.role === 'tool' && 
+                        const toolResults = nextMessages.filter(m =>
+                          m.role === 'tool' &&
                           msg.toolCalls?.some(tc => tc.id === m.toolCallId)
                         )
-                        
+
                         return toolResults.length > 0 ? (
                           <div className="space-y-2">
                             {toolResults.map(toolMsg => (
@@ -1258,9 +1170,9 @@ export default function Home() {
 
                               if (language === 'mermaid') {
                                 return (
-                                  <MermaidBlock 
-                                    code={codeContent} 
-                                    theme={theme} 
+                                  <MermaidBlock
+                                    code={codeContent}
+                                    theme={theme}
                                     onExpand={(svgContent) => {
                                       setLightbox({
                                         kind: 'mermaid',
@@ -1282,9 +1194,8 @@ export default function Home() {
 
                               return (
                                 <code
-                                  className={`${className} px-1.5 py-0.5 rounded font-mono text-sm ${
-                                    isDark ? 'bg-slate-800 text-cyan-200' : 'bg-slate-300 text-cyan-800'
-                                  }`}
+                                  className={`${className} px-1.5 py-0.5 rounded font-mono text-sm ${isDark ? 'bg-slate-800 text-cyan-200' : 'bg-slate-300 text-cyan-800'
+                                    }`}
                                   {...props}
                                 >
                                   {children}
@@ -1300,7 +1211,7 @@ export default function Home() {
 
                     {/* ============= MESSAGE ACTIONS ============= */}
                     {msg.role === 'assistant' && !isLoading && (() => {
-                      const hasMedia = !!msg.imageUrl || !!msg.videoUrl
+                      const hasMedia = !!msg.imageUrl
                       const hasTools = !!msg.toolCalls && msg.toolCalls.length > 0
 
                       return (
@@ -1310,13 +1221,12 @@ export default function Home() {
                             <>
                               <button
                                 onClick={() => handleSpeak(msg.content, msg.id)}
-                                className={`flex items-center gap-1.5 text-xs transition-colors ${
-                                  speakingId === msg.id
-                                    ? 'text-cyan-600 animate-pulse'
-                                    : isDark
-                                      ? 'text-slate-400 hover:text-white'
-                                      : 'text-slate-600 hover:text-slate-900'
-                                }`}
+                                className={`flex items-center gap-1.5 text-xs transition-colors ${speakingId === msg.id
+                                  ? 'text-cyan-600 animate-pulse'
+                                  : isDark
+                                    ? 'text-slate-400 hover:text-white'
+                                    : 'text-slate-600 hover:text-slate-900'
+                                  }`}
                                 title={speakingId === msg.id ? "Berhenti bicara" : "Bacakan respon"}
                               >
                                 {speakingId === msg.id ? (
@@ -1334,9 +1244,8 @@ export default function Home() {
 
                               <button
                                 onClick={() => handleCopyContent(msg.content, msg.id)}
-                                className={`flex items-center gap-1.5 text-xs transition-colors ${
-                                  isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                                }`}
+                                className={`flex items-center gap-1.5 text-xs transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                                  }`}
                                 title="Salin respon"
                               >
                                 {copiedMessageId === msg.id ? (
@@ -1360,9 +1269,8 @@ export default function Home() {
                                 <a
                                   href={msg.imageUrl}
                                   download={`reka-image-${msg.id}.png`}
-                                  className={`flex items-center gap-1.5 text-xs transition-colors ${
-                                    isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                                  }`}
+                                  className={`flex items-center gap-1.5 text-xs transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                                    }`}
                                   title="Download gambar"
                                 >
                                   <Download className="w-3.5 h-3.5" />
@@ -1370,28 +1278,15 @@ export default function Home() {
                                 </a>
                               )}
 
-                              {msg.videoUrl && (
-                                <a
-                                  href={msg.videoUrl}
-                                  download={`reka-video-${msg.id}.mp4`}
-                                  className={`flex items-center gap-1.5 text-xs transition-colors ${
-                                    isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                                  }`}
-                                  title="Download video"
-                                >
-                                  <Download className="w-3.5 h-3.5" />
-                                  <span>Download</span>
-                                </a>
-                              )}
+
                             </>
                           )}
 
                           {index === messages.length - 1 && (
                             <button
                               onClick={handleRegenerate}
-                              className={`flex items-center gap-1.5 text-xs transition-colors ${
-                                isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                              }`}
+                              className={`flex items-center gap-1.5 text-xs transition-colors ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                                }`}
                               title="Ulangi respon"
                             >
                               <RotateCw className="w-3.5 h-3.5" />
@@ -1405,44 +1300,44 @@ export default function Home() {
                     {msg.role === 'user' && !isLoading && (
                       <div className={`mt-2 pt-2 flex items-center justify-end gap-4 ${isDark ? 'border-t border-slate-700/50' : 'border-t border-slate-400'}`}>
                         <button
-                            onClick={() => handleCopyContent(displayContent, msg.id)}
-                            className={`flex items-center gap-1.5 text-xs transition-colors 
-                            ${isDark 
-                                ? 'text-slate-400 hover:text-white' 
-                                : 'text-slate-600 hover:text-slate-900'
+                          onClick={() => handleCopyContent(displayContent, msg.id)}
+                          className={`flex items-center gap-1.5 text-xs transition-colors 
+                            ${isDark
+                              ? 'text-slate-400 hover:text-white'
+                              : 'text-slate-600 hover:text-slate-900'
                             }`}
-                            title="Salin pesan"
+                          title="Salin pesan"
                         >
-                            {copiedMessageId === msg.id ? (
-                              <>
-                                <Check className="w-3 h-3 text-green-400" />
-                                <span className="text-green-400">Disalin</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3 h-3" />
-                                <span>Salin</span>
-                              </>
-                            )}
+                          {copiedMessageId === msg.id ? (
+                            <>
+                              <Check className="w-3 h-3 text-green-400" />
+                              <span className="text-green-400">Disalin</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>Salin</span>
+                            </>
+                          )}
                         </button>
 
                         {index === lastUserMessageIndex && (
-                            editingIndex === index ? (
-                              <span className="text-xs text-cyan-400 italic animate-pulse">Sedang mengedit...</span>
-                            ) : (
-                              <button
-                                onClick={() => handleEditMessage(index)}
-                                className={`flex items-center gap-1.5 text-xs transition-colors 
-                                ${isDark 
-                                    ? 'text-slate-400 hover:text-white' 
-                                    : 'text-slate-600 hover:text-slate-900'
+                          editingIndex === index ? (
+                            <span className="text-xs text-cyan-400 italic animate-pulse">Sedang mengedit...</span>
+                          ) : (
+                            <button
+                              onClick={() => handleEditMessage(index)}
+                              className={`flex items-center gap-1.5 text-xs transition-colors 
+                                ${isDark
+                                  ? 'text-slate-400 hover:text-white'
+                                  : 'text-slate-600 hover:text-slate-900'
                                 }`}
-                                title="Edit pesan"
-                              >
-                                <Pencil className="w-3 h-3" />
-                                <span>Edit</span>
-                              </button>
-                            )
+                              title="Edit pesan"
+                            >
+                              <Pencil className="w-3 h-3" />
+                              <span>Edit</span>
+                            </button>
+                          )
                         )}
                       </div>
                     )}
@@ -1461,25 +1356,23 @@ export default function Home() {
 
           {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4 justify-start">
-               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex-shrink-0 flex items-center justify-center shadow-lg mt-1">
-                  <img
-                    src="/favicon.ico"
-                    alt="Logo Reka"
-                    className="w-7.5 h-7.5 animate-spin"
-                  />
-               </div>
-               <div className={`border rounded-2xl rounded-bl-none p-4 flex items-center gap-2 transition-colors ${
-                 isDark 
-                   ? 'bg-slate-950/50 border-white/10' 
-                   : 'bg-white border-slate-300 shadow-sm'
-               }`}>
-                 <span className={`text-sm ${
-                   isDark ? 'text-slate-400' : 'text-slate-600'
-                 }`}>Menunggu respon...</span>
-               </div>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex-shrink-0 flex items-center justify-center shadow-lg mt-1">
+                <img
+                  src="/favicon.ico"
+                  alt="Logo Reka"
+                  className="w-7.5 h-7.5 animate-spin"
+                />
+              </div>
+              <div className={`border rounded-2xl rounded-bl-none p-4 flex items-center gap-2 transition-colors ${isDark
+                ? 'bg-slate-950/50 border-white/10'
+                : 'bg-white border-slate-300 shadow-sm'
+                }`}>
+                <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'
+                  }`}>Menunggu respon...</span>
+              </div>
             </motion.div>
           )}
-          
+
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -1493,24 +1386,24 @@ export default function Home() {
           )}
 
           <div className={`absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl blur opacity-20 group-hover:opacity-60 transition duration-500 ${isFocused ? 'opacity-80 blur-md' : ''}`} />
-          
+
           <form onSubmit={handleSubmit} className="relative bg-slate-900 ring-1 ring-white/10 rounded-2xl p-2 shadow-2xl">
             {editingIndex !== null && (
-               <div className="px-3 pb-2 flex items-center justify-between text-xs text-cyan-400 border-b border-white/10 mb-2">
-                  <span>✏️ Mengedit pesan sebelumnya...</span>
-                  <button type="button" onClick={handleCancelEdit} className="flex items-center hover:text-red-400 transition-colors">
-                    <XCircle className="w-3 h-3 mr-1" /> Batal
-                  </button>
-               </div>
+              <div className="px-3 pb-2 flex items-center justify-between text-xs text-cyan-400 border-b border-white/10 mb-2">
+                <span>✏️ Mengedit pesan sebelumnya...</span>
+                <button type="button" onClick={handleCancelEdit} className="flex items-center hover:text-red-400 transition-colors">
+                  <XCircle className="w-3 h-3 mr-1" /> Batal
+                </button>
+              </div>
             )}
 
             {selectedImage && (
               <div className="px-3 pt-3 pb-1">
                 <div className="relative inline-block">
-                  <img 
-                    src={selectedImage} 
-                    alt="Preview" 
-                    className="h-16 w-auto rounded-lg border border-slate-700/50 object-cover" 
+                  <img
+                    src={selectedImage}
+                    alt="Preview"
+                    className="h-16 w-auto rounded-lg border border-slate-700/50 object-cover"
                   />
                   <button
                     type="button"
@@ -1544,20 +1437,19 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => docInputRef.current?.click()}
-                className={`p-2 rounded-lg transition-colors ${
-                  isUploading ? 'text-cyan-400 animate-pulse' : 'text-slate-400 hover:text-cyan-400 hover:bg-slate-800'
-                }`}
+                className={`p-2 rounded-lg transition-colors ${isUploading ? 'text-cyan-400 animate-pulse' : 'text-slate-400 hover:text-cyan-400 hover:bg-slate-800'
+                  }`}
                 disabled={isUploading}
                 title="Upload Dokumen (PDF/Text)"
               >
-                <Paperclip className="w-5 h-5" /> 
+                <Paperclip className="w-5 h-5" />
               </button>
 
-              <input 
-                type="file" 
-                ref={docInputRef} 
+              <input
+                type="file"
+                ref={docInputRef}
                 onChange={handleDocSelect}
-                className="hidden" 
+                className="hidden"
                 accept=".pdf,.txt,.md,.json,.js,.ts,.tsx"
               />
 
@@ -1570,22 +1462,21 @@ export default function Home() {
                 <ImageIcon className="w-5 h-5" />
               </button>
 
-              <input 
-                type="file" 
-                ref={fileInputRef} 
+              <input
+                type="file"
+                ref={fileInputRef}
                 onChange={handleFileSelect}
-                className="hidden" 
+                className="hidden"
                 accept="image/*"
               />
 
               <button
                 type="button"
                 onClick={isListening ? stopListening : startListening}
-                className={`p-2 rounded-lg transition-all active:scale-95 ${
-                  isListening 
-                    ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' // Style saat merekam
-                    : 'text-slate-400 hover:text-cyan-400 hover:bg-slate-800' // Style normal
-                }`}
+                className={`p-2 rounded-lg transition-all active:scale-95 ${isListening
+                  ? 'bg-red-500/20 text-red-400 animate-pulse border border-red-500/30' // Style saat merekam
+                  : 'text-slate-400 hover:text-cyan-400 hover:bg-slate-800' // Style normal
+                  }`}
                 title={isListening ? "Klik untuk berhenti" : "Klik untuk bicara (Bahasa Indonesia)"}
               >
                 {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -1603,7 +1494,7 @@ export default function Home() {
                 rows={1}
                 style={{ minHeight: '50px' }}
               />
-              
+
               <button
                 type="submit"
                 disabled={(!input.trim() && !selectedImage) || isLoading}
@@ -1613,7 +1504,7 @@ export default function Home() {
               </button>
             </div>
           </form>
-          
+
           <p className="text-center text-xs text-slate-600 mt-2">
             &copy; {new Date().getFullYear()} Andre Saputra
           </p>
@@ -1640,10 +1531,10 @@ export default function Home() {
                 <h3 className="text-white font-medium text-sm flex items-center gap-2">
                   {lightbox.kind === 'mermaid' ? '📊 Diagram View' : 'Media View'}
                 </h3>
-                
+
                 <div className="flex items-center gap-2">
                   <a
-                    href={lightbox.kind === 'mermaid' 
+                    href={lightbox.kind === 'mermaid'
                       ? `data:image/svg+xml;base64,${typeof window !== 'undefined' ? btoa(lightbox.content) : ''}`
                       : lightbox.src
                     }
@@ -1675,19 +1566,11 @@ export default function Home() {
                       style={{ maxHeight: '85vh', maxWidth: '90vw' }}
                     />
                   )}
-                  
-                  {lightbox.kind === 'video' && (
-                    <video
-                      src={lightbox.src}
-                      controls
-                      autoPlay
-                      className="max-h-[85vh] max-w-[90vw] object-contain bg-black rounded-lg shadow-2xl"
-                      onMouseDown={(e) => e.stopPropagation()} 
-                    />
-                  )}
+
+
 
                   {lightbox.kind === 'mermaid' && (
-                    <div 
+                    <div
                       className="pointer-events-none select-none p-10"
                       dangerouslySetInnerHTML={{ __html: lightbox.content }}
                     />

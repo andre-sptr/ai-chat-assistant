@@ -1,12 +1,8 @@
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { streamText, generateText, experimental_generateImage as generateImage } from 'ai'
 import { executeTool } from '@/lib/tools/tools'
 
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
-
 export const maxDuration = 30;
+
+const SUMOPOD_API_URL = 'https://ai.sumopod.com/v1/chat/completions'
 
 const SYSTEM_PROMPT = `
 PERAN & IDENTITAS:
@@ -110,6 +106,11 @@ Spesialisasi: Html, Python, C/C++, PHP, TypeScript, Tailwind CSS.
 Tugasmu membantu user menulis kode. Berikan jawaban yang ringkas, tepat, dan menggunakan praktik terbaik (best practices).
 `;
 
+interface SumopodMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
 function parseToolCalls(text: string): { toolCalls: any[], cleanText: string } {
   const toolCalls: any[] = []
   let cleanText = text
@@ -121,14 +122,14 @@ function parseToolCalls(text: string): { toolCalls: any[], cleanText: string } {
     try {
       const jsonStr = match[0]
       const toolCall = JSON.parse(jsonStr)
-      
+
       if (toolCall.tool) {
         toolCalls.push({
           id: `tool_${Date.now()}_${toolCalls.length}`,
           name: toolCall.tool,
           arguments: { ...toolCall }
         })
-        
+
         cleanText = cleanText.replace(jsonStr, '').trim()
       }
     } catch (e) {
@@ -139,123 +140,54 @@ function parseToolCalls(text: string): { toolCalls: any[], cleanText: string } {
   return { toolCalls, cleanText }
 }
 
+async function callSumopodAPI(
+  model: string,
+  messages: SumopodMessage[],
+  stream: boolean = false,
+  maxTokens: number = 4096,
+  temperature: number = 0.7
+): Promise<Response> {
+  const response = await fetch(SUMOPOD_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.SUMOPOD_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages,
+      max_tokens: maxTokens,
+      temperature,
+      stream,
+    }),
+  })
+
+  return response
+}
+
 export async function POST(req: Request) {
   try {
-    if (!process.env.GEMINI_API_KEY) {
-      console.error("❌ ERROR: API Key belum dipasang di .env.local");
+    if (!process.env.SUMOPOD_API_KEY) {
+      console.error("❌ ERROR: SUMOPOD_API_KEY belum dipasang di .env.local");
       return new Response("API Key not found", { status: 500 });
     }
 
     const { messages, model, useTools } = await req.json();
-    const selectedModel = model || 'gemini-2.5-flash';
+    const selectedModel = model || 'gemini/gemini-2.5-flash';
 
-    if (selectedModel.startsWith('imagen-')) {
-      const lastUser = [...messages].reverse().find((m: any) => m.role === 'user')
-      const prompt = (lastUser?.content || '').trim() || 'Generate an image.'
-      const { image } = await generateImage({
-        model: google.image(selectedModel),
-        prompt,
-        aspectRatio: '1:1',
-      })
-      const imageUrl = `data:${image.mediaType};base64,${image.base64}`
-      return new Response(JSON.stringify({ text: '', imageUrl }), {
-        headers: { 'Content-Type': 'application/json' },
-      })
-    }
-
-    const isGeminiImageModel = selectedModel === 'gemini-2.5-flash-image' || selectedModel === 'gemini-3-pro-image-preview'
-    if (isGeminiImageModel) {
-      const lastUser = [...messages].reverse().find((m: any) => m.role === 'user')
-      const prompt = (lastUser?.content || '').trim() || 'Generate an image.'
-      const result = await generateText({
-        model: google(selectedModel),
-        prompt,
-        providerOptions: {
-          google: {
-            responseModalities: ['TEXT', 'IMAGE'],
-            imageConfig: { aspectRatio: '1:1' },
-          },
-        },
-      })
-      const imgFile = result.files?.find(f => f.mediaType?.startsWith('image/'))
-      if (!imgFile) {
-        return new Response(JSON.stringify({ text: result.text ?? '', imageUrl: null }), { headers: { 'Content-Type': 'application/json' } })
-      }
-      const base64 = Buffer.from(imgFile.uint8Array).toString('base64')
-      const imageUrl = `data:${imgFile.mediaType};base64,${base64}`
-      return new Response(JSON.stringify({ text: result.text ?? '', imageUrl }), { headers: { 'Content-Type': 'application/json' } })
-    }
-
-    if (selectedModel.startsWith('veo-')) {
-      const lastUser = [...messages].reverse().find((m: any) => m.role === 'user')
-      const prompt = (lastUser?.content || '').trim() || 'Generate a short video.'
-      const baseUrl = 'https://generativelanguage.googleapis.com/v1beta'
-      const startRes = await fetch(`${baseUrl}/models/${selectedModel}:predictLongRunning`, {
-        method: 'POST',
-        headers: { 'x-goog-api-key': process.env.GEMINI_API_KEY!, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ instances: [{ prompt }], parameters: { aspectRatio: '16:9' } }),
-      })
-      if (!startRes.ok) {
-        const errText = await startRes.text()
-        return new Response(errText, { status: startRes.status, headers: { 'Content-Type': startRes.headers.get('content-type') || 'application/json' } })
-      }
-      const startJson = await startRes.json()
-      return new Response(JSON.stringify({ text: '🎬 Oke, aku sedang membuat videonya…', videoOp: startJson.name }), { headers: { 'Content-Type': 'application/json' } })
-    }
-
-    if (selectedModel.startsWith('veo-')) {
-      const lastUser = [...messages].reverse().find((m: any) => m.role === 'user')
-      const prompt = (lastUser?.content || '').trim() || 'Generate a short video.'
-      const baseUrl = 'https://generativelanguage.googleapis.com/v1beta'
-      const startRes = await fetch(
-        `${baseUrl}/models/${selectedModel}:predictLongRunning`,
-        {
-          method: 'POST',
-          headers: {
-            'x-goog-api-key': process.env.GEMINI_API_KEY!,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            instances: [{ prompt }],
-            parameters: {
-              aspectRatio: '16:9',
-            },
-          }),
-        }
-      )
-
-      if (!startRes.ok) {
-        const errText = await startRes.text()
-        return new Response(errText, {
-          status: startRes.status,
-          headers: { 'Content-Type': startRes.headers.get('content-type') || 'application/json' },
-        })
-      }
-
-      const startJson = await startRes.json()
-      return new Response(
-        JSON.stringify({
-          text: '🎬 Oke, aku sedang membuat videonya…',
-          videoOp: startJson.name,
-        }),
-        { headers: { 'Content-Type': 'application/json' } }
-      )
-    }
-
-    const formattedMessages = messages.map((m: any) => {
+    // Format messages for Sumopod API (OpenAI-compatible format)
+    const formattedMessages: SumopodMessage[] = messages.map((m: any) => {
       if (m.role === 'user' && m.imageUrl) {
+        // For image messages, include image description in text
         return {
           role: 'user',
-          content: [
-            { type: 'text', text: m.content },
-            { type: 'image', image: m.imageUrl },
-          ],
+          content: `[User mengirim gambar]\n${m.content}`,
         }
       }
 
       if (m.role === 'tool') {
         return {
-          role: 'user', 
+          role: 'user',
           content: `[Tool Result for ${m.toolName || 'unknown'}]: ${JSON.stringify(m.result)}`
         }
       }
@@ -266,16 +198,7 @@ export async function POST(req: Request) {
     if (useTools && formattedMessages.length > 0) {
       const lastMsgIndex = formattedMessages.length - 1
       const lastMsg = formattedMessages[lastMsgIndex]
-      
-      if (lastMsg.role === 'user' && typeof lastMsg.content === 'string') {
-        lastMsg.content += `\n\n(SYSTEM NOTE: Jika pertanyaan ini butuh data realtime/hitungan, JANGAN MENJAWAB LANGSUNG. Gunakan JSON tool yang sesuai terlebih dahulu.)`
-      }
-    }
 
-    if (useTools && formattedMessages.length > 0) {
-      const lastMsgIndex = formattedMessages.length - 1
-      const lastMsg = formattedMessages[lastMsgIndex]
-      
       if (lastMsg.role === 'user' && typeof lastMsg.content === 'string') {
         lastMsg.content += `\n\n(SYSTEM NOTE: Jika pertanyaan ini butuh data realtime/hitungan, JANGAN MENJAWAB LANGSUNG. Gunakan JSON tool yang sesuai terlebih dahulu.)`
       }
@@ -284,13 +207,27 @@ export async function POST(req: Request) {
     // ============= TOOLS MODE =============
     if (useTools) {
       try {
-        const result = await generateText({
-          model: google(selectedModel),
-          messages: formattedMessages,
-          system: SYSTEM_PROMPT,
-        })
+        const systemMessages: SumopodMessage[] = [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...formattedMessages
+        ]
 
-        const responseText = result.text || ''
+        const response = await callSumopodAPI(selectedModel, systemMessages, false)
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          console.error('Sumopod API Error:', errorText)
+          return new Response(JSON.stringify({
+            text: `Error dari API: ${errorText}`,
+            error: errorText
+          }), {
+            headers: { 'Content-Type': 'application/json' },
+            status: response.status
+          })
+        }
+
+        const data = await response.json()
+        const responseText = data.choices?.[0]?.message?.content || ''
         const { toolCalls, cleanText } = parseToolCalls(responseText)
 
         if (toolCalls.length > 0) {
@@ -306,28 +243,41 @@ export async function POST(req: Request) {
             })
           )
 
-          const newHistory = [
+          const newHistory: SumopodMessage[] = [
+            { role: 'system', content: SYSTEM_PROMPT },
             ...formattedMessages,
-            { 
-              role: 'assistant', 
+            {
+              role: 'assistant',
               content: responseText
             },
             {
               role: 'user',
-              content: toolResults.map(tr => 
+              content: toolResults.map(tr =>
                 `[Tool Result for ${tr.toolName}]: ${JSON.stringify(tr.result)}`
               ).join('\n\n')
             }
           ];
 
-          const secondResponse = await generateText({
-            model: google(selectedModel),
-            messages: newHistory as any,
-            system: SYSTEM_PROMPT,
-          })
+          const secondResponse = await callSumopodAPI(selectedModel, newHistory, false)
+
+          if (!secondResponse.ok) {
+            const errorText = await secondResponse.text()
+            console.error('Sumopod API Error (second call):', errorText)
+            return new Response(JSON.stringify({
+              text: `Error dari API: ${errorText}`,
+              toolCalls,
+              toolResults
+            }), {
+              headers: { 'Content-Type': 'application/json' },
+              status: secondResponse.status
+            })
+          }
+
+          const secondData = await secondResponse.json()
+          const secondText = secondData.choices?.[0]?.message?.content || ''
 
           return new Response(JSON.stringify({
-            text: secondResponse.text,
+            text: secondText,
             toolCalls,
             toolResults
           }), {
@@ -353,16 +303,80 @@ export async function POST(req: Request) {
     }
 
     // ============= STREAMING MODE (No Tools) =============
-    const result = streamText({
-      model: google(selectedModel),
-      messages: formattedMessages,
-      system: SYSTEM_PROMPT_NO_TOOLS,
+    const systemMessages: SumopodMessage[] = [
+      { role: 'system', content: SYSTEM_PROMPT_NO_TOOLS },
+      ...formattedMessages
+    ]
+
+    const response = await callSumopodAPI(selectedModel, systemMessages, true)
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Sumopod API Error:', errorText)
+      return new Response(JSON.stringify({ error: errorText }), {
+        headers: { 'Content-Type': 'application/json' },
+        status: response.status
+      })
+    }
+
+    // Transform SSE stream to plain text stream for frontend compatibility
+    const reader = response.body?.getReader()
+    const encoder = new TextEncoder()
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        if (!reader) {
+          controller.close()
+          return
+        }
+
+        const decoder = new TextDecoder()
+        let buffer = ''
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() || ''
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6)
+                if (data === '[DONE]') continue
+
+                try {
+                  const json = JSON.parse(data)
+                  const content = json.choices?.[0]?.delta?.content
+                  if (content) {
+                    controller.enqueue(encoder.encode(content))
+                  }
+                } catch (e) {
+                  // Skip invalid JSON
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Stream error:', error)
+        } finally {
+          controller.close()
+        }
+      }
     })
-    
-    return result.toTextStreamResponse();
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    })
   } catch (error) {
     console.error("🔥 SERVER ERROR:", error);
-    return new Response(JSON.stringify({ error: "Gagal memproses pesan" }), { 
+    return new Response(JSON.stringify({ error: "Gagal memproses pesan" }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
