@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🤖 AI Chat Assistant
 
-## Getting Started
+Sebuah aplikasi web asisten cerdas berbasis AI yang dirancang untuk memberikan pengalaman percakapan yang interaktif dan kaya fitur. Aplikasi ini dibangun menggunakan arsitektur modern Next.js (App Router) dan mendukung berbagai mode interaksi pengguna.
 
-First, run the development server:
+## ✨ Fitur Utama
 
+- **Smart AI Chat**: Endpoint API khusus (`/api/chat`) untuk memproses dan merespons obrolan pengguna dengan kecerdasan buatan.
+- **Voice/Speech Recognition**: Pengguna dapat berbicara langsung ke aplikasi menggunakan suara yang akan diubah menjadi teks (menggunakan custom hook `useSpeechRecognition`).
+- **File Upload**: Dukungan pengunggahan file (`/api/upload`) untuk dianalisis atau diproses lebih lanjut oleh AI.
+- **AI Tools Integration**: Dilengkapi dengan sistem *tools/function calling* (`src/lib/tools`) yang memungkinkan AI melakukan tugas-tugas spesifik.
+
+## 💻 Teknologi yang Digunakan
+
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Library UI**: [React.js](https://react.dev/)
+- **Bahasa**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+
+## 🚀 Cara Menjalankan Project Secara Lokal
+
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi ini di komputer Anda:
+
+### Prasyarat
+Pastikan Anda sudah menginstal **Node.js** dan **npm** (atau package manager lain seperti pnpm/yarn) di komputer Anda. Anda mungkin juga memerlukan API Key dari provider AI (seperti OpenAI, Gemini, dll) tergantung pada implementasi di `/api/chat`.
+
+### 1. Clone Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+git clone https://github.com/andre-sptr/ai.git
